@@ -9,9 +9,9 @@ namespace RaspberryPi_CS
 {
 	public partial class Form1 : Form
 	{
-		private readonly InputPinConfiguration p2 = null;
-		private readonly InputPinConfiguration p3 = null;
-		private readonly InputPinConfiguration p4 = null;
+		private readonly InputPinConfiguration GPIO2 = null;
+		private readonly InputPinConfiguration GPIO3 = null;
+		private readonly InputPinConfiguration GPIO4 = null;
 		private readonly GpioConnection connection = null;
 		private readonly Server server = new Server();
 		private bool isOutput = false;
@@ -38,10 +38,10 @@ namespace RaspberryPi_CS
 			getIO();
 
 			// ここで示すピン番号は定義されている名称
-			p2 = ProcessorPin.Pin2.Input().PullUp();
-			p3 = ProcessorPin.Pin3.Input().PullUp();
-			p4 = ProcessorPin.Pin4.Input().PullUp();
-			connection = new GpioConnection(p2, p3, p4);
+			GPIO2 = ProcessorPin.Pin2.Input().PullUp();
+			GPIO3 = ProcessorPin.Pin3.Input().PullUp();
+			GPIO4 = ProcessorPin.Pin4.Input().PullUp();
+			connection = new GpioConnection(GPIO2, GPIO3, GPIO4);
 			// 入力変化時のイベント
 			connection.PinStatusChanged += (sender, eventArgs) =>
 			{
@@ -65,21 +65,19 @@ namespace RaspberryPi_CS
 		/// </summary>
 		private void getIO()
 		{
-			// ここで示すピン番号は物理的な番号
-			ProcessorPin p3 = ConnectorPin.P1Pin03.ToProcessor();
-			ProcessorPin p5 = ConnectorPin.P1Pin05.ToProcessor();
-			ProcessorPin p7 = ConnectorPin.P1Pin07.ToProcessor();
+			ProcessorPin p2 = ProcessorPin.Pin02;
+			ProcessorPin p3 = ProcessorPin.Pin03;
+			ProcessorPin p4 = ProcessorPin.Pin04;
+			_ = p2.Input().PullUp();
 			_ = p3.Input().PullUp();
-			_ = p5.Input().PullUp();
-			_ = p7.Input().PullUp();
+			_ = p4.Input().PullUp();
 			IGpioConnectionDriver drv = GpioConnectionSettings.DefaultDriver;
+			drv.Allocate(p2, PinDirection.Input);
 			drv.Allocate(p3, PinDirection.Input);
-			drv.Allocate(p5, PinDirection.Input);
-			drv.Allocate(p7, PinDirection.Input);
-			checkBox1.Checked = drv.Read(p3);
-			checkBox2.Checked = drv.Read(p5);
-			checkBox3.Checked = drv.Read(p7);
-
+			drv.Allocate(p4, PinDirection.Input);
+			checkBox1.Checked = drv.Read(p2);
+			checkBox2.Checked = drv.Read(p3);
+			checkBox3.Checked = drv.Read(p4);
 		}
 
 		/// <summary>
@@ -90,9 +88,9 @@ namespace RaspberryPi_CS
 		private void Form1_FormClosed(object sender, FormClosedEventArgs e)
 		{
 			server.Close();
-			connection.Remove(p2);
-			connection.Remove(p3);
-			connection.Remove(p4);
+			connection.Remove(GPIO2);
+			connection.Remove(GPIO3);
+			connection.Remove(GPIO4);
 			connection.Close();
 		}
 
@@ -116,11 +114,11 @@ namespace RaspberryPi_CS
 		/// <param name="e"></param>
 		private void button2_Click(object sender, EventArgs e)
 		{
-			ProcessorPin p8 = ConnectorPin.P1Pin08.ToProcessor();
-			_ = p8.Output();
+			ProcessorPin p14 = ProcessorPin.Pin14;
+			_ = p14.Output();
 			IGpioConnectionDriver drv = GpioConnectionSettings.DefaultDriver;
-			drv.Allocate(p8, PinDirection.Output);
-			drv.Write(p8, isOutput);
+			drv.Allocate(p14, PinDirection.Output);
+			drv.Write(p14, isOutput);
 			isOutput = !isOutput;
 		}
 	}
